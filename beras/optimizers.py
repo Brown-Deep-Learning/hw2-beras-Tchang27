@@ -44,10 +44,10 @@ class Adam:
         for i in range(len(trainable_params)):
             self.t+=1
             if trainable_params[i].trainable:
-                self.m[i] = self.beta_1*self.m[i]+(1-self.beta_1)*grads[i]
-                self.v[i] = self.beta_2*self.v[i]+(1-self.beta_2)*(grads[i]*grads[i])
-                m_hat[i] = self.m[i] / (1-self.beta_1**self.t)
-                v_hat[i] = self.v[i] / (1-self.beta_2**self.t)
+                self.m[i] = self.beta_1*self.m[i]+(1.0-self.beta_1)*grads[i]
+                self.v[i] = self.beta_2*self.v[i]+(1.0-self.beta_2)*(grads[i]**2)
+                m_hat[i] = self.m[i] / (1.0-self.beta_1**self.t)
+                v_hat[i] = self.v[i] / (1.0-self.beta_2**self.t)
                 trainable_params[i] -= self.learning_rate*(m_hat[i]/(np.sqrt(v_hat[i])+self.epsilon))
                 
 
