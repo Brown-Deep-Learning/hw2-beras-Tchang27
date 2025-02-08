@@ -16,7 +16,11 @@ class RMSProp:
         self.v = defaultdict(lambda: 0)
 
     def apply_gradients(self, trainable_params, grads):
-        return NotImplementedError
+        # TODO: Implement
+        for i in range(len(trainable_params)):
+            if trainable_params[i].trainable:
+                self.v[i] = self.beta*self.v[i] + (1-self.beta)*(grads[i])*(grads[i])
+                trainable_params[i] -= (self.learning_rate / (np.sqrt(self.v[i])+self.epsilon)) * grads[i]
 
 
 class Adam:
@@ -35,4 +39,15 @@ class Adam:
         self.t = 0                              # Time counter
 
     def apply_gradients(self, trainable_params, grads):
-        return NotImplementedError
+        m_hat = defaultdict(lambda: 0)         
+        v_hat = defaultdict(lambda: 0) 
+        for i in range(len(trainable_params)):
+            self.t+=1
+            if trainable_params[i].trainable:
+                self.m[i] = self.beta_1*self.m[i]+(1-self.beta_1)*grads[i]
+                self.v[i] = self.beta_2*self.v[i]+(1-self.beta_2)*(grads[i]*grads[i])
+                m_hat[i] = self.m[i] / (1-self.beta_1**self.t)
+                v_hat[i] = self.v[i] / (1-self.beta_2**self.t)
+                trainable_params[i] -= self.learning_rate*(m_hat[i]/(np.sqrt(v_hat[i])+self.epsilon))
+                
+

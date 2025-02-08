@@ -21,7 +21,9 @@ class LeakyReLU(Activation):
 
     def forward(self, x) -> Tensor:
         """Leaky ReLu forward propagation!"""
-        return NotImplementedError
+        res = np.copy(x)
+        res[res < 0] *= self.alpha
+        return Tensor(res)
 
     def get_input_gradients(self) -> list[Tensor]:
         """
@@ -29,7 +31,10 @@ class LeakyReLU(Activation):
         To see what methods/variables you have access to, refer to the cheat sheet.
         Hint: Make sure not to mutate any instance variables. Return a new list[tensor(s)]
         """
-        raise NotImplementedError
+        grad = np.copy(self.inputs)
+        grad[grad > 0] = 1
+        grad[grad < 0] = self.alpha
+        return [Tensor(grad)]
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
@@ -48,14 +53,16 @@ class Sigmoid(Activation):
     ## TODO: Implement for default output activation to bind output to 0-1
     
     def forward(self, x) -> Tensor:
-        raise NotImplementedError
+        out = 1 / (1+np.exp(-x))
+        return Tensor(out)
 
     def get_input_gradients(self) -> list[Tensor]:
         """
         To see what methods/variables you have access to, refer to the cheat sheet.
         Hint: Make sure not to mutate any instance variables. Return a new list[tensor(s)]
         """
-        raise NotImplementedError
+        o = np.array(self.outputs)
+        return Tensor(o * (1-o))
 
     def compose_input_gradients(self, J):
         return self.get_input_gradients()[0] * J
@@ -74,7 +81,9 @@ class Softmax(Activation):
 
         ## HINT: Use stable softmax, which subtracts maximum from
         ## all entries to prevent overflow/underflow issues
-        raise NotImplementedError
+        exps = np.exp(x-np.max(x))
+        outs = exps / np.sum(exps, axis=-1, keepdims=True)
+        return Tensor(outs)
 
     def get_input_gradients(self):
         """Softmax input gradients!"""
@@ -83,4 +92,7 @@ class Softmax(Activation):
         grad = np.zeros(shape=(bn, n, n), dtype=x.dtype)
         
         # TODO: Implement softmax gradient
-        raise NotImplementedError
+        diag = np.array([np.diag(s) for s in y])  
+        other = np.einsum('bi,bj->bij', y, y)
+        grad = diag - other 
+        return [Tensor(grad)]

@@ -40,3 +40,24 @@ class GradientTape:
 
         # What tensor and what gradient is for you to implement!
         # compose_input_gradients and compose_weight_gradients are methods that will be helpful
+
+        # bfs for gradients
+        passed = None
+        while queue:
+            node = queue.pop(0)
+            node_id = id(node)
+            if node_id in self.previous_layers.keys():
+                layer = self.previous_layers[node_id]
+                curr_grad = grads[node_id]
+                for input, input_grad in zip(layer.inputs, layer.compose_input_gradients(curr_grad)): # from Diffable 
+                    grads[id(input)] = [input_grad]
+                    queue.append(input)
+                for weight, weight_grad in zip(layer.weights, layer.compose_weight_gradients(curr_grad)): # from Diffable
+                    grads[id(weight)] = [weight_grad]
+                    queue.append(weight)
+            else:
+                continue
+
+        # get gradients for sources
+        out_grads = [grads[id(source)][0] for source in sources]
+        return out_grads
