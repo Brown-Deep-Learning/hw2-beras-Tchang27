@@ -16,17 +16,16 @@ class Loss(Diffable):
 
 class MeanSquaredError(Loss):
     def forward(self, y_pred: Tensor, y_true: Tensor) -> Tensor:
-        mse_total = np.mean(np.power(y_pred * y_true - y_true, 2), axis=-1)
+        mse_total = np.mean(np.power(y_pred - y_true, 2), axis=-1)
         return np.mean(mse_total, axis=0)
 
     def get_input_gradients(self) -> list[Tensor]:
         y_pred, y_true = self.inputs
-        grad = 2 * ((y_pred * y_true) - y_true) / y_pred.shape[0]
-        # grad wrt to y_true is jsut the negative
+        grad = 2 * (y_pred - y_true) / np.prod(y_pred.shape)
         return [Tensor(grad), Tensor(-grad)]
 
 class CategoricalCrossEntropy(Loss):
-    def clip(self, x, eps=1e-12):
+    def clip(self, x, eps=1e-8):
         return np.clip(x, eps, 1-eps)
     
     def forward(self, y_pred, y_true):

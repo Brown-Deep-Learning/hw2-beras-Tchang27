@@ -14,7 +14,7 @@ def get_model():
     model = SequentialModel(
         [
             Dense(784, 32, initializer="xavier"),
-            ReLU(),
+            LeakyReLU(),
             Dense(32, 10, initializer="xavier"),
             Softmax(),
         ]
@@ -28,7 +28,7 @@ def get_optimizer():
 
 def get_loss_fn():
     # choose a loss function, initialize it and return it!
-    loss = CategoricalCrossEntropy()
+    loss = MeanSquaredError()
     return loss
 
 def get_acc_fn():
