@@ -39,10 +39,10 @@ class Adam:
         self.t = 0                              # Time counter
 
     def apply_gradients(self, trainable_params, grads):
+        self.t+=1
         m_hat = defaultdict(lambda: 0)         
         v_hat = defaultdict(lambda: 0) 
         for i in range(len(trainable_params)):
-            self.t+=1
             if trainable_params[i].trainable:
                 self.m[i] = self.beta_1*self.m[i]+(1.0-self.beta_1)*grads[i]
                 self.v[i] = self.beta_2*self.v[i]+(1.0-self.beta_2)*(grads[i]**2)

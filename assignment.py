@@ -14,7 +14,7 @@ def get_model():
     model = SequentialModel(
         [
             Dense(784, 32, initializer="xavier"),
-            ReLU(),
+            LeakyReLU(),
             Dense(32, 10, initializer="xavier"),
             Softmax(),
         ]
@@ -23,7 +23,7 @@ def get_model():
 
 def get_optimizer():
     # choose an optimizer, initialize it and return it!
-    opt = Adam(0.001)
+    opt = Adam(0.01)
     return opt
 
 def get_loss_fn():
