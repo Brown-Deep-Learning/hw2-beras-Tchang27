@@ -78,14 +78,15 @@ class Model(Diffable):
         into the batch_step method with training. At the end, the metrics are returned.
         """
         agg_metrics = defaultdict(lambda: [])
-        batch_num = x.shape[0] // batch_size
+        num_batches = (x.shape[0] // batch_size) + 1
         for e in range(epochs):
             epoch_metrics = defaultdict(lambda: [])
-            for b, b1 in enumerate(range(batch_size, x.shape[0] + 1, batch_size)):
-                b0 = b1 - batch_size
+            for b in range(num_batches):
+                b0 = b * batch_size
+                b1 = b0 + batch_size
                 batch_metrics = self.batch_step(x[b0:b1], y[b0:b1], training=True)
                 update_metric_dict(epoch_metrics, batch_metrics)
-                print_stats(batch_metrics, b, batch_num, e)
+                print_stats(batch_metrics, b, num_batches, e)
             update_metric_dict(agg_metrics, epoch_metrics)
             print_stats(epoch_metrics, epoch=e, avg=True)
         return agg_metrics
@@ -101,22 +102,17 @@ class Model(Diffable):
         the core logic should be the same)
         """
         agg_metrics = defaultdict(lambda: [])
-        predictions = []
-        batch_num = x.shape[0] // batch_size
+        num_batches = (x.shape[0] // batch_size) + 1
         
-        for b, b1 in enumerate(range(batch_size, x.shape[0] + 1, batch_size)):
-            b0 = b1 - batch_size
-            batch_metrics, batch_preds = self.batch_step(x[b0:b1], y[b0:b1], training=False)
-            predictions.append(batch_preds)
+        for b in range(num_batches):
+            b0 = b * batch_size
+            b1 = b0 + batch_size
+            batch_metrics, _ = self.batch_step(x[b0:b1], y[b0:b1], training=False)
             update_metric_dict(agg_metrics, batch_metrics)
-            print_stats(batch_metrics, b, batch_num)
+            print_stats(batch_metrics, b, num_batches)
         agg_metrics = { k:np.mean(v) for k,v in agg_metrics.items() }
         print_stats(agg_metrics, avg=True)
 
-        # save predictions
-        predictions = np.argmax(np.concatenate(predictions), axis=1)
-        np.save("predictions.npy", predictions)
-        
         return agg_metrics
 
     def get_input_gradients(self) -> list[Tensor]:

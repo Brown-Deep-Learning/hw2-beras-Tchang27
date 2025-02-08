@@ -50,7 +50,7 @@ if __name__ == '__main__':
         loss_fn=get_loss_fn(),
         acc_fn=get_acc_fn(),
     )
-    epoch = 1
+    epoch = 10
     batch_size = 256
     
     # 3. Load and preprocess the data
@@ -72,4 +72,9 @@ if __name__ == '__main__':
     # 5. Evaluate the model
     test_agg_metrics = model.evaluate(test_inputs, ohe(test_labels), batch_size=256)
     print("Testing Performance:", test_agg_metrics)
+
+    # save predictions
+    predictions = model.forward(test_inputs)
+    predictions = np.argmax(predictions, axis=1)
+    np.save("predictions.npy", predictions)
     
