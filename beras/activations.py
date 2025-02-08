@@ -22,7 +22,7 @@ class LeakyReLU(Activation):
     def forward(self, x) -> Tensor:
         """Leaky ReLu forward propagation!"""
         res = np.copy(x)
-        res[res < 0] *= self.alpha
+        res[res <= 0] *= self.alpha
         return Tensor(res)
 
     def get_input_gradients(self) -> list[Tensor]:
@@ -33,7 +33,7 @@ class LeakyReLU(Activation):
         """
         grad = np.copy(self.inputs)
         grad[grad > 0] = 1
-        grad[grad < 0] = self.alpha
+        grad[grad <= 0] = self.alpha
         return [Tensor(grad)]
 
     def compose_input_gradients(self, J):

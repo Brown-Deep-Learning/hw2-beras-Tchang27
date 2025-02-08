@@ -81,12 +81,12 @@ class Weighted(ABC):
     @property
     def trainable(self) -> bool:
         """Returns true if any of the weights are trainable"""
-        return len(self.trainable_weights) > 0
+        return len(self.trainable_variables) > 0
 
     @trainable.setter
     def trainable(self, trainable: bool):
         """Sets the trainable status of all weights to trainable"""
-        for w in self.trainable_weights:
+        for w in self.trainable_variables:
             w.trainable = trainable
 
 
