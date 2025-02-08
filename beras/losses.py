@@ -25,13 +25,13 @@ class MeanSquaredError(Loss):
         return [Tensor(grad), Tensor(-grad)]
 
 class CategoricalCrossEntropy(Loss):
-    def clip(self, x, eps=1e-8):
+    def clip(self, x, eps=1e-12):
         return np.clip(x, eps, 1-eps)
     
     def forward(self, y_pred, y_true):
         """Categorical cross entropy forward pass!"""
         y_pred = self.clip((y_pred))
-        cce_total = -np.mean(y_true * np.log(y_pred), axis=1)
+        cce_total = -np.sum(y_true * np.log(y_pred), axis=1)
         return Tensor(np.mean(cce_total))
 
     def get_input_gradients(self):
